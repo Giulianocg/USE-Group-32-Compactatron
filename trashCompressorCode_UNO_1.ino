@@ -6,10 +6,10 @@
 int amountOfDistanceChecks = 5; //if all distance checks are below minimumDistance, then close the trash can.
 int durationBetweenChecks = 100; //milliseconds.
 int minimumDistance = 10; //centimeters.
-int height = 40; //centimeters.
+int height = 100; //centimeters.
 int counter = 0; //sends distance measured every X measurements
 //Compressing.
-int durationForcompressingAndDecompressing = 2000; //milliseconds, time it takes for closing and time it takes to open, total time = 2*durationForcompressingAndDecompressing.
+int durationForcompressingAndDecompressing = 6000; //milliseconds, time it takes for closing and time it takes to open, total time = 2*durationForcompressingAndDecompressing.
 int durationBeforePressureAfterPressureAndAfterRelease = 1000; //milliseconds, time it waits before compressing, after the plastic was compressed, time it takes after releasing (after opening), total time = 2*durationBeforePressureAfterPressureAndAfterRelease.
 
 //Locking.
@@ -21,13 +21,13 @@ int timeForLockingAndUnlocking = 1000; // Milliseconds, duration for rotation of
 
 //stuff for serial communication with ESP32
 #include <SoftwareSerial.h>
-SoftwareSerial ArdUNO_soft_ser (9, 10); //(RX, TX)
+SoftwareSerial ArdUNO_soft_ser (10, 11); //(RX, TX)
 char c;
 String dataIn;
 
 //DISTANCE SENSORS VARIABLES.
 int trig = 12;
-int echo = 11;
+int echo = 13;
 int timeInMicro;
 int distanceInCm;
 

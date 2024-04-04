@@ -3,7 +3,7 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 const char* Wifi_name = "KPNC254F6";
-const char* Wifi_pass =  "mdd4Xk1kHxcWpKHf";
+const char* Wifi_pass =  "password";
 const char* host = "engdesblinds.000webhostapp.com";
 
 const char* ID =  "1";
