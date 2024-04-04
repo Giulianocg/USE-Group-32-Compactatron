@@ -1,0 +1,123 @@
+<?php
+/*This file should receive a link somethong like this: https://engdesblinds.000webhostapp.com/TX.php?pubpw=%27Password123456-%27&privpw=Bussiness1&un=1&id=1&coordx=1&coordy=3
+
+If you paste that link to your browser, it should update b1 value with this TX.php file. 
+*/
+
+//We loop through and grab variables from the received the URL
+
+$ind1=0;
+$ind2=0;
+$ind3=0;
+foreach($_REQUEST as $key => $value)  //Save the received value to the key variable. Save each character after the "&"
+{
+
+    if($key =="id"){  //the local id, as in the id that the businesses knows
+    $unit = $value;
+    }	
+    if($key =="pubpw"){  //the public password, all businesses know this one
+    $pass1 = $value;
+    }	
+    if($key =="privpw"){  //the private password, each is unique for each business
+    $pass2 = $value;
+    }
+    if($key =="un"){  //update number 1 for setting the coordinates, nr 2 for sensor data
+    $update_number = $value;
+    }
+    if($key =="coordx"){  //coordinates
+    	$sent_coord_x = $value;
+    }
+    else if($key =="coordy"){  //coordinates
+    	$sent_coord_y = $value;
+    }
+    if($key =="n1"){   //weight
+    $ind1=1;
+    $sent_weight = $value;
+    }
+    else if($key =="n2"){   //if its full
+    $ind2=1;
+    $sent_bool_full = $value;
+    }
+    else if($key =="n3"){    //If its compressing
+    $ind3=1;
+    $sent_bool_comp = $value;
+    }
+}
+
+
+include("database_connect.php"); 	//with this we import $con, which has the detailt to connect to the database
+
+
+// Check  the connection
+if (mysqli_connect_errno()) {
+  echo "Failed to connect to MySQL: " . mysqli_connect_error();
+}
+
+//Now we update the values in database
+//get all the passwords
+
+$result = mysqli_query($con,"SELECT Password FROM Allowed_Passwords");
+$AllPasswords=array();
+while($row = mysqli_fetch_array($result, MYSQLI_NUM))
+{
+    $AllPasswords[]=$row[0];
+}
+
+if(in_array($pass2, $AllPasswords, true)) //check if the given password is valid
+{
+    $res = mysqli_query($con,"SELECT id FROM Compactatron WHERE Priv_Pass = '$pass2' AND local_id = $unit");
+    $rres = mysqli_fetch_array($res, MYSQLI_NUM);
+    $true_id = $rres[0];
+    print_r($true_id);
+    
+    if($update_number == 2)
+    	{
+    		mysqli_query($con,"UPDATE Compactatron SET CoordsX = $sent_coord_x WHERE id=$true_id AND PASSWORD=$pass1");
+    		mysqli_query($con,"UPDATE Compactatron SET CoordsY = $sent_coord_y WHERE id=$true_id AND PASSWORD=$pass1");
+    		mysqli_query($con,"UPDATE Compactatron SET BOOL_ON_OFF = 1 WHERE id=$true_id AND PASSWORD=$pass1");
+    	}
+    else if($update_number == 1)
+    	{
+    	    if($ind1 == 1){
+    		mysqli_query($con,"UPDATE Compactatron SET Weight = $sent_weight WHERE id=$true_id AND PASSWORD=$pass1");	
+    	    }
+    	    if($ind2 == 1){
+    		mysqli_query($con,"UPDATE Compactatron SET Full_bool = $sent_bool_full WHERE id=$true_id AND PASSWORD=$pass1");
+    	    }
+    	    if($ind3 == 1){
+    		mysqli_query($con,"UPDATE Compactatron SET Bool_Compressing = $sent_bool_comp WHERE id=$true_id AND PASSWORD=$pass1");
+    	    }
+    		mysqli_query($con,"UPDATE Compactatron SET BOOL_ON_OFF = 1 WHERE id=$true_id AND PASSWORD=$pass1");
+    	}
+} 
+else 
+{
+    echo "password not recognised";
+}
+
+
+//In case that you need the time from the internet, use this line
+date_default_timezone_set('UTC');
+$t1 = date("gi"); 	//This will return 1:23 as 123
+
+//Get all the values form the table on the database
+$result = mysqli_query($con,"SELECT * FROM Compactatron");	//table select is ESPtable2, must be the same on yor database
+
+//Loop through the table and filter out data for this unit id equal to the one taht we've received. 
+while($row = mysqli_fetch_array($result)) {
+if($row['id'] == $unit){
+	
+		//We update the values for the boolean and numbers we receive from the Arduino, then we echo the boolean
+		//and numbers and the text from the database back to the Arduino
+		$b1 = $row['Weight'];	
+		
+		//Next line will echo the data back to the Arduino
+		echo "$t1##$b1";
+	
+}
+
+
+	
+}// End of the while loop
+?>
+
