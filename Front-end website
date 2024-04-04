@@ -31,7 +31,7 @@ $sec = "200";
 
 <link rel="stylesheet" type="text/css" href="./style.css" />
 
-<script src="https://maps.google.com/maps/api/js?key=AIzaSyAvC1az7iZYjlR7psOWMR8fhucBo4ErA-s" 
+<script src="https://maps.google.com/maps/api/js?key=myAPIkey" 
           type="text/javascript"></script>
 
 <title>Currently Observing your trash cans</title>
